@@ -279,10 +279,20 @@ async function setupCamera() {
 // =========================
 
 async function loadModel() {
-    session = await ort.InferenceSession.create("./model/sign_model.onnx");
-    modelInputName  = session.inputNames[0];
-    modelOutputName = session.outputNames[0];
-    console.log(`ONNX loaded (${modelInputName} -> ${modelOutputName})`);
+    // Safari/iOS requires simd-disabled WASM and specific backend ordering
+    ort.env.wasm.numThreads = 1;
+    ort.env.wasm.simd       = false;
+
+    const opts = { executionProviders: ["wasm"] };
+    try {
+        session = await ort.InferenceSession.create("./model/sign_model.onnx", opts);
+        modelInputName  = session.inputNames[0];
+        modelOutputName = session.outputNames[0];
+        console.log(`ONNX loaded (${modelInputName} -> ${modelOutputName})`);
+    } catch (e) {
+        console.warn("ONNX model failed to load — running heuristic-only mode:", e.message);
+        session = null;
+    }
 }
 
 // =========================
@@ -1007,7 +1017,7 @@ async function startApp() {
     try {
         await setupCamera();
         await createMediaPipe();
-        await loadModel();
+        await loadModel(); // sets session=null on failure; heuristic mode still works
 
         if (DEBUG_MODE) {
             window.debugCapture = startDebugCapture;
