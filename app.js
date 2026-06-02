@@ -30,7 +30,7 @@ let session         = null;
 let modelInputName  = "input";
 let modelOutputName = "output";
 
-let currentPrediction  = "Waiting...";
+let currentPrediction  = "Esperando...";
 let currentConfidence  = 0;
 let historyWords       = [];
 let lastHistoryWordTime = 0;
@@ -200,9 +200,7 @@ function analyzeFeatureStatistics() {
 // =========================
 
 let video, canvas, ctx;
-let predictionText, confidenceText, historyList, topPredictionsContainer;
-let recordedVideoInput, recordedVideoButton, recordedVideo, recordedVideoResult;
-let recordedStartFrame, recordedEndFrame;
+let predictionText, confidenceText, confidenceBar, historyList;
 let recordedProcessingCanvas, recordedProcessingCtx;
 
 function getRequiredElement(id) {
@@ -212,19 +210,13 @@ function getRequiredElement(id) {
 }
 
 function initializeUI() {
-    video                    = getRequiredElement("video");
-    canvas                   = getRequiredElement("overlay");
-    ctx                      = canvas.getContext("2d");
-    predictionText           = getRequiredElement("predictionText");
-    confidenceText           = getRequiredElement("confidenceText");
-    historyList              = getRequiredElement("historyList");
-    topPredictionsContainer  = getRequiredElement("topPredictionsContainer");
-    recordedVideoInput       = getRequiredElement("recordedVideoInput");
-    recordedVideoButton      = getRequiredElement("recordedVideoBtn");
-    recordedVideo            = getRequiredElement("recordedVideo");
-    recordedVideoResult      = getRequiredElement("recordedVideoResult");
-    recordedStartFrame       = getRequiredElement("recordedStartFrame");
-    recordedEndFrame         = getRequiredElement("recordedEndFrame");
+    video           = getRequiredElement("video");
+    canvas          = getRequiredElement("overlay");
+    ctx             = canvas.getContext("2d");
+    predictionText  = getRequiredElement("predictionText");
+    confidenceText  = getRequiredElement("confidenceText");
+    confidenceBar   = getRequiredElement("confidenceBar");
+    historyList     = getRequiredElement("historyList");
     recordedProcessingCanvas = document.createElement("canvas");
     recordedProcessingCtx    = null;
 }
@@ -248,7 +240,6 @@ function showError(message) {
     console.error(message);
     predictionText.textContent = message;
     confidenceText.textContent = "";
-    topPredictionsContainer.innerHTML = `<div class="errorMessage">${message}</div>`;
 }
 
 async function setupCamera() {
@@ -298,16 +289,22 @@ async function loadModel() {
 // =========================
 
 function addToHistory(word) {
-    historyWords.unshift(word);
+    const now = new Date();
+    const time = now.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+    historyWords.unshift({ word, time });
     if (historyWords.length > 15) historyWords.pop();
     renderHistory();
 }
 
 function renderHistory() {
     historyList.innerHTML = "";
-    historyWords.forEach(word => {
+    historyWords.forEach(({ word, time }) => {
         const li = document.createElement("li");
-        li.textContent = word;
+        li.innerHTML = `
+            <span class="historyDot"></span>
+            <span class="historyWord">${word}</span>
+            <span class="historyTime">${time}</span>
+        `;
         historyList.appendChild(li);
     });
 }
@@ -317,7 +314,7 @@ function renderHistory() {
 // =========================
 
 function speakPrediction() {
-    if (currentPrediction === "Waiting...") return;
+    if (currentPrediction === "Esperando..." || currentPrediction === "Waiting...") return;
     speechSynthesis.speak(new SpeechSynthesisUtterance(currentPrediction));
 }
 
@@ -328,11 +325,9 @@ function speakPrediction() {
 function updatePredictionUI(label, confidence, probs) {
     currentPrediction = label;
     currentConfidence = confidence;
-    predictionText.textContent = label;
-    confidenceText.textContent = `${confidence.toFixed(1)}%`;
-    topPredictionsContainer.innerHTML = probs.map(item =>
-        `<div class="predRow"><span>${item.label}</span><span>${item.conf.toFixed(1)}%</span></div>`
-    ).join("");
+    predictionText.textContent = `"${label}"`;
+    confidenceText.textContent = `${confidence.toFixed(0)}%`;
+    confidenceBar.style.width  = `${Math.min(confidence, 100)}%`;
 }
 
 // =========================
@@ -351,8 +346,6 @@ function cross2D(ax, ay, bx, by, cx, cy) {
 //                    false → back of hand faces camera (away from face)
 //   fingersTipY: average y of fingertips (landmarks 8,12,16,20); smaller = higher on screen
 function classifyHandOrientation(landmarks, mirrored = true) {
-    // Wrist = 0, Index MCP = 5, Pinky MCP = 17
-    // Cross product of wrist→index vs wrist→pinky tells us palm facing direction.
     const w  = landmarks[0];
     const im = landmarks[5];
     const pm = landmarks[17];
@@ -361,61 +354,135 @@ function classifyHandOrientation(landmarks, mirrored = true) {
 
     const fingersTipY = (landmarks[8].y + landmarks[12].y + landmarks[16].y + landmarks[20].y) / 4;
 
-    // Finger extension: compare tip-to-wrist distance vs MCP-to-wrist distance.
-    // Extended fingers have tips far from wrist; curled fingers have tips close.
     function dist(a, b) { return Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2); }
+
+    // 4-finger extension ratio (indices 8,12,16,20 vs MCPs 5,9,13,17)
     const tipDist = (dist(landmarks[8], w) + dist(landmarks[12], w) + dist(landmarks[16], w) + dist(landmarks[20], w)) / 4;
     const mcpDist = (dist(landmarks[5], w) + dist(landmarks[9], w) + dist(landmarks[13], w) + dist(landmarks[17], w)) / 4;
     const tipMcpRatio = mcpDist > 0 ? tipDist / mcpDist : 1;
+
+    // Thumb extension: tip (4) vs base (2) relative to wrist
+    const thumbTip  = dist(landmarks[4], w);
+    const thumbBase = dist(landmarks[2], w);
+    const thumbRatio = thumbBase > 0 ? thumbTip / thumbBase : 1;
+
+    // Finger spread: horizontal distance between index tip and pinky tip
+    const spread = Math.abs(landmarks[8].x - landmarks[20].x);
+
+    // Average tip-to-MCP pip distance as curl indicator
+    const pipDist = (dist(landmarks[7], landmarks[5]) + dist(landmarks[11], landmarks[9]) +
+                     dist(landmarks[15], landmarks[13]) + dist(landmarks[19], landmarks[17])) / 4;
+    const pipMcpRatio = mcpDist > 0 ? pipDist / mcpDist : 1;
+
     const fingersExtended = tipMcpRatio >= 1.4;
 
-    console.log(`[hand] cross=${c.toFixed(4)} palmFacing=${palmFacingCamera} ratio=${tipMcpRatio.toFixed(3)} extended=${fingersExtended}`);
+    console.log(`[hand] cross=${c.toFixed(4)} palmFacing=${palmFacingCamera} ratio=${tipMcpRatio.toFixed(3)} thumb=${thumbRatio.toFixed(3)} spread=${spread.toFixed(3)} pip=${pipMcpRatio.toFixed(3)}`);
 
-    return { palmFacingCamera, fingersTipY, fingersExtended, tipMcpRatio };
+    return { palmFacingCamera, fingersTipY, fingersExtended, tipMcpRatio, thumbRatio, spread, pipMcpRatio };
 }
 
-// Classify orientation across all detected hands in a frame sequence.
-// Uses the most recent frame that has hand landmarks.
+// Aggregate hand orientation over the full gesture buffer (uses median of ratio values for stability)
+function aggregateHandOrientation(handResultFrames, handIdx = 0) {
+    const ratios = [], thumbs = [], spreads = [], pipRatios = [], palmVotes = [];
+    for (const frame of handResultFrames) {
+        if (!frame || !frame.landmarks || frame.landmarks.length <= handIdx) continue;
+        const h = classifyHandOrientation(frame.landmarks[handIdx], true);
+        ratios.push(h.tipMcpRatio);
+        thumbs.push(h.thumbRatio);
+        spreads.push(h.spread);
+        pipRatios.push(h.pipMcpRatio);
+        palmVotes.push(h.palmFacingCamera ? 1 : 0);
+    }
+    if (ratios.length === 0) { console.log(`[agg] no frames with handIdx=${handIdx}`); return null; }
+    const median = arr => { const s = [...arr].sort((a,b)=>a-b); return s[Math.floor(s.length/2)]; };
+    return {
+        tipMcpRatio:    median(ratios),
+        thumbRatio:     median(thumbs),
+        spread:         median(spreads),
+        pipMcpRatio:    median(pipRatios),
+        palmFacingCamera: (palmVotes.reduce((a,b)=>a+b,0) / palmVotes.length) >= 0.5
+    };
+}
+
 function classifyGestureHeuristic(handResultFrames) {
-    // Find the last frame that has landmarks
     let lastHandResult = null;
+    let maxHandCount   = 0;
+
     for (let i = handResultFrames.length - 1; i >= 0; i--) {
-        if (handResultFrames[i] && handResultFrames[i].landmarks && handResultFrames[i].landmarks.length > 0) {
-            lastHandResult = handResultFrames[i];
-            break;
-        }
+        const f = handResultFrames[i];
+        if (!f || !f.landmarks || f.landmarks.length === 0) continue;
+        if (!lastHandResult) lastHandResult = f;
+        if (f.landmarks.length > maxHandCount) maxHandCount = f.landmarks.length;
     }
     if (!lastHandResult) return null;
 
-    const count = lastHandResult.landmarks.length;
+    // Use the peak hand count seen in the gesture, not just the last frame.
+    // MediaPipe sometimes drops one hand momentarily — if we saw 2 hands at any point,
+    // treat this as a 2-hand gesture.
+    const count = maxHandCount;
+    const twoHandFrames = handResultFrames.filter(f => f && f.landmarks && f.landmarks.length >= 2);
+    const twoHandRatio  = twoHandFrames.length / handResultFrames.length;
+    console.log(`[gesture] maxHands=${maxHandCount} twoHandRatio=${twoHandRatio.toFixed(2)} totalFrames=${handResultFrames.length}`);
 
     if (count === 1) {
-        const { tipMcpRatio } = classifyHandOrientation(lastHandResult.landmarks[0], true);
+        const h = aggregateHandOrientation(handResultFrames, 0);
+        if (!h) return null;
 
-        // Basado en valores reales observados:
-        // drink  → ratio ~1.8  (dedos muy extendidos)
-        // cool   → ratio ~0.93 (dedos medios)
-        // before → ratio ~0.85 (dedos más cerrados)
-        if (tipMcpRatio >= 1.4) {
-            return { label: "drink", conf: 90 };
-        }
-        // Zona ambigua entre before y cool (0.845 vs 0.933, muy cercanos)
-        if (tipMcpRatio >= 0.87 && tipMcpRatio < 1.4) {
-            return { label: "cool", conf: 70, ambiguous: true, top2: ["cool", "before"] };
-        }
-        return { label: "before", conf: 90 };
+        const { tipMcpRatio, thumbRatio, spread, pipMcpRatio } = h;
+
+        console.log(`[1hand] ratio=${tipMcpRatio.toFixed(3)} thumb=${thumbRatio.toFixed(3)} spread=${spread.toFixed(3)} pip=${pipMcpRatio.toFixed(3)}`);
+
+        // Valores reales observados:
+        //   drink:  ratio ~1.8,  thumb ~?,    spread ~?,     pip ~?
+        //   before: ratio ~0.88, thumb ~1.78, spread ~0.054, pip ~0.047
+        //   cool:   ratio ~0.93, thumb ~1.13, spread ~0.006, pip ~0.24
+
+        // drink: ratio claramente alto
+        if (tipMcpRatio >= 1.5) return { label: "drink", conf: 92 };
+
+        // before vs cool: thumb y pip son los mejores discriminadores
+        // before → thumb extendido (≥1.5) Y pip bajo (dedos rectos)
+        // cool   → thumb corto (<1.5) Y pip alto (dedos curvados)
+        const thumbExtended = thumbRatio >= 1.5;
+        const fingersCurled = pipMcpRatio >= 0.15;
+
+        if (thumbExtended && !fingersCurled) return { label: "before", conf: 88 };
+        if (!thumbExtended && fingersCurled) return { label: "cool",   conf: 88 };
+
+        // Zona genuinamente ambigua
+        return { label: "cool", conf: 65, ambiguous: true, top2: ["cool", "before"] };
     }
 
-    if (count >= 2) {
-        // go   → 2 manos, ambas palmas hacia cámara
-        // thin → 2 manos, orientaciones mixtas
-        const h0 = classifyHandOrientation(lastHandResult.landmarks[0], true);
-        const h1 = classifyHandOrientation(lastHandResult.landmarks[1], true);
-        const bothFacingCamera = h0.palmFacingCamera && h1.palmFacingCamera;
-        if (bothFacingCamera) {
-            return { label: "go", conf: 90 };
+    if (count >= 2 && twoHandRatio >= 0.25) {
+        // Per-hand horizontal dominance — promedio de ambas manos por separado.
+        // go:   cada mano individualmente tiene |dx| > |dy| (índice apunta al lado)
+        // thin: cada mano tiene |dy| > |dx| (meñique apunta arriba)
+        const perHandHDom = [];
+        const pinkyDyArr  = [];
+
+        for (const frame of twoHandFrames) {
+            for (let hi = 0; hi < Math.min(2, frame.landmarks.length); hi++) {
+                const lm = frame.landmarks[hi];
+                const w  = lm[0];
+                const idx8dx = Math.abs(lm[8].x - w.x);
+                const idx8dy = Math.abs(lm[8].y - w.y);
+                perHandHDom.push(idx8dx / (idx8dy + 0.001));
+                pinkyDyArr.push(lm[20].y - w.y);
+            }
         }
-        return { label: "thin", conf: 90 };
+
+        if (perHandHDom.length === 0) return { label: "thin", conf: 75 };
+
+        const mean = arr => arr.reduce((a,b)=>a+b,0) / arr.length;
+        const avgHDom    = mean(perHandHDom);
+        const avgPinkyDy = mean(pinkyDyArr);
+        const pinkyUp    = avgPinkyDy < -0.04;
+
+        console.log(`[2hands] avgHDom=${avgHDom.toFixed(2)} avgPinkyDy=${avgPinkyDy.toFixed(3)} pinkyUp=${pinkyUp}`);
+
+        // go: índices claramente horizontales en ambas manos, meñiques no apuntan arriba
+        if (avgHDom > 1.0 && !pinkyUp) return { label: "go",   conf: 88 };
+        return                                 { label: "thin", conf: 88 };
     }
 
     return null;
@@ -480,17 +547,23 @@ function commitPrediction(label) {
     const now = performance.now();
     updatePredictionUI(label, 90, [{ label, conf: 90 }]);
     if (
-        (historyWords.length === 0 || historyWords[0] !== label) &&
+        (historyWords.length === 0 || historyWords[0].word !== label) &&
         (now - lastHistoryWordTime) >= HISTORY_COOLDOWN_MS
     ) {
         addToHistory(label);
         lastHistoryWordTime = now;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(new SpeechSynthesisUtterance(label));
     }
 }
 
 function runHeuristicModel(handResultFrames) {
     const result = classifyGestureHeuristic(handResultFrames);
-    if (!result) return;
+    if (!result) {
+        predictionText.textContent = currentPrediction === "Esperando..." ? "Esperando..." : `"${currentPrediction}"`;
+        confidenceText.textContent = currentConfidence > 0 ? `${currentConfidence.toFixed(0)}%` : "";
+        return;
+    }
 
     updatePredictionUI(result.label, result.conf, [{ label: result.label, conf: result.conf }]);
 
@@ -925,12 +998,11 @@ async function startApp() {
 document.addEventListener("DOMContentLoaded", () => {
     initializeUI();
     initAmbiguityModal();
-    getRequiredElement("speakBtn").addEventListener("click", speakPrediction);
-    getRequiredElement("clearBtn").addEventListener("click", () => {
+    document.getElementById("speakBtn").addEventListener("click", speakPrediction);
+    document.getElementById("speakIconBtn").addEventListener("click", speakPrediction);
+    document.getElementById("clearBtn").addEventListener("click", () => {
         historyWords = [];
         renderHistory();
     });
-    recordedVideoInput.addEventListener("change", handleRecordedVideoSelected);
-    recordedVideoButton.addEventListener("click", testRecordedVideo);
     startApp();
 });

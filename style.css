@@ -5,205 +5,301 @@
 }
 
 body {
-    background: #f4f6f8;
-    font-family: -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        sans-serif;
+    background: #f0f2f5;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
     color: #222;
+    min-height: 100vh;
 }
+
+/* ========================
+   APP SHELL
+======================== */
 
 .app {
-    max-width: 1100px;
-    margin: auto;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 20px;
+/* ========================
+   HEADER
+======================== */
+
+.appHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 16px;
+    padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 
-header h1 {
-    font-size: 2rem;
+.appHeaderLeft h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111;
 }
 
-.cameraSection {
-    width: 100%;
+.appSubtitle {
+    font-size: .8rem;
+    color: #888;
+    margin-top: 2px;
 }
+
+.settingsBtn {
+    background: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    transition: background .15s;
+}
+
+.settingsBtn:hover { background: #f4f6f8; }
+
+/* ========================
+   MAIN LAYOUT
+======================== */
+
+.mainLayout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 16px;
+    align-items: start;
+}
+
+/* ========================
+   CAMERA PANEL
+======================== */
+
+.cameraPanel {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.cameraPanelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cameraPanelLabel {
+    font-size: .9rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.speakBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: .85rem;
+    cursor: pointer;
+    background: white;
+    color: #333;
+    transition: background .15s;
+}
+
+.speakBtn:hover { background: #f4f6f8; }
 
 .cameraWrapper {
     position: relative;
     width: 100%;
-    overflow: hidden;
-    border-radius: 24px;
-    background: black;
+    background: #111;
+    aspect-ratio: 16/9;
 }
 
 #video {
     width: 100%;
+    height: 100%;
     display: block;
+    object-fit: cover;
 }
 
 #overlay {
     position: absolute;
-    left: 0;
-    top: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
 }
 
-.predictionCard {
-    margin-top: 20px;
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,.08);
-}
+/* ========================
+   SIDE PANEL
+======================== */
 
-#predictionText {
-    font-size: 2rem;
-    margin-bottom: 8px;
-}
-
-#confidenceText {
-    font-size: 1.2rem;
-    color: #666;
-}
-
-.errorMessage {
-    color: #d32f2f;
-    font-weight: 700;
-    padding: 12px 0;
-}
-
-.topPredictions {
-    margin-top: 20px;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.08);
-}
-
-.topPredictions h3 {
-    margin-bottom: 12px;
-}
-
-.predRow {
+.sidePanel {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 1rem;
-}
-
-.recordedTestSection {
-    margin-top: 20px;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.08);
-}
-
-.recordedTestSection h3 {
-    margin-bottom: 12px;
-}
-
-.recordedTestSection input,
-.recordedTestSection button {
-    margin-bottom: 12px;
-}
-
-.recordedTestSection label {
-    display: inline-flex;
     flex-direction: column;
-    gap: 4px;
-    margin-right: 12px;
-    margin-bottom: 12px;
-    font-size: .9rem;
-    color: #555;
+    gap: 16px;
 }
 
-.recordedTestSection label input {
-    width: 130px;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
+/* ========================
+   INTERPRETATION
+======================== */
 
-.recordedTestSection button {
-    border: none;
-    border-radius: 16px;
-    padding: 12px 16px;
-    font-size: 1rem;
-    cursor: pointer;
-    background: #f4f6f8;
-}
-
-#recordedVideo {
-    display: block;
-    width: 100%;
-    max-height: 420px;
-    margin-top: 8px;
-    background: black;
-    border-radius: 16px;
-}
-
-#recordedVideoResult {
-    margin-top: 12px;
-    padding: 12px;
-    overflow: auto;
-    white-space: pre-wrap;
-    background: #f4f6f8;
-    border-radius: 12px;
-    font-size: .9rem;
-}
-
-.controls {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.controls button {
-    flex: 1;
-    border: none;
-    border-radius: 16px;
-    padding: 14px;
-    font-size: 1rem;
-    cursor: pointer;
+.interpretationSection {
     background: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 
-.controls button:hover {
-    transform: translateY(-2px);
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
 }
+
+.sectionTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.iconBtn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #888;
+    padding: 4px;
+    border-radius: 8px;
+    transition: background .15s;
+}
+
+.iconBtn:hover { background: #f4f6f8; }
+
+.predictionBox {
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 24px 16px;
+    text-align: center;
+    margin-bottom: 16px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.predictionText {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.confidenceRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.confidenceLabel {
+    font-size: .75rem;
+    color: #888;
+    white-space: nowrap;
+}
+
+.confidenceBarWrap {
+    flex: 1;
+    height: 6px;
+    background: #eee;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.confidenceBar {
+    height: 100%;
+    background: #2563eb;
+    border-radius: 99px;
+    width: 0%;
+    transition: width .4s ease;
+}
+
+.confidenceValue {
+    font-size: .8rem;
+    font-weight: 700;
+    color: #2563eb;
+    min-width: 36px;
+    text-align: right;
+}
+
+/* ========================
+   HISTORY
+======================== */
 
 .historySection {
-    margin-top: 20px;
     background: white;
-    border-radius: 20px;
+    border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 
-.historySection h3 {
+.historySection .sectionTitle {
     margin-bottom: 12px;
 }
 
 #historyList {
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 #historyList li {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 8px;
+    border-bottom: 1px solid #f4f4f4;
+    font-size: .95rem;
+    color: #333;
+    gap: 8px;
 }
 
 #historyList li:last-child {
     border-bottom: none;
 }
+
+.historyWord {
+    flex: 1;
+    font-weight: 500;
+}
+
+.historyTime {
+    font-size: .75rem;
+    color: #bbb;
+    white-space: nowrap;
+}
+
+.historyDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+}
+
+/* ========================
+   AMBIGUITY MODAL
+======================== */
 
 .ambiguityOverlay {
     position: fixed;
@@ -229,7 +325,7 @@ header h1 {
 }
 
 .ambiguityQuestion {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 24px;
     color: #222;
@@ -255,7 +351,7 @@ header h1 {
 
 .ambiguityBtn:hover {
     background: #e8f0fe;
-    border-color: #4285f4;
+    border-color: #2563eb;
     transform: translateY(-2px);
 }
 
@@ -268,17 +364,18 @@ header h1 {
     padding: 4px 8px;
 }
 
-.ambiguityDismiss:hover {
-    color: #555;
-}
+.ambiguityDismiss:hover { color: #555; }
+
+/* ========================
+   RESPONSIVE
+======================== */
 
 @media (max-width: 768px) {
-
-    .controls {
-        flex-direction: column;
+    .mainLayout {
+        grid-template-columns: 1fr;
     }
 
-    #predictionText {
-        font-size: 1.5rem;
+    .predictionText {
+        font-size: 1.4rem;
     }
 }

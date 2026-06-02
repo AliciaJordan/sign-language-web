@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Language Translator</title>
+    <title>Intérprete de Lenguaje de Señas</title>
 
     <link rel="stylesheet" href="style.css">
-
     <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
@@ -25,117 +24,65 @@
         window.PoseLandmarker = PoseLandmarker;
         window.DrawingUtils = DrawingUtils;
     </script>
-
 </head>
 
 <body>
 
     <div class="app">
 
-        <header>
-            <h1>🤟 Sign Language Translator</h1>
+        <header class="appHeader">
+            <div class="appHeaderLeft">
+                <h1>Intérprete de Lenguaje de Señas</h1>
+                <p class="appSubtitle">Reconocimiento en tiempo real</p>
+            </div>
+            <button class="settingsBtn" title="Configuración">⚙</button>
         </header>
 
-        <section class="cameraSection">
+        <div class="mainLayout">
 
-            <div class="cameraWrapper">
+            <!-- Left: camera -->
+            <section class="cameraPanel">
+                <div class="cameraPanelHeader">
+                    <span class="cameraPanelLabel">Vista de Cámara</span>
+                    <button id="speakBtn" class="speakBtn">
+                        <span class="speakIcon">🔊</span> Speak
+                    </button>
+                </div>
+                <div class="cameraWrapper">
+                    <video id="video" autoplay playsinline muted></video>
+                    <canvas id="overlay"></canvas>
+                </div>
+            </section>
 
-                <video
-                    id="video"
-                    autoplay
-                    playsinline
-                    muted>
-                </video>
+            <!-- Right: prediction + history -->
+            <aside class="sidePanel">
 
-                <canvas id="overlay"></canvas>
+                <section class="interpretationSection">
+                    <div class="sectionHeader">
+                        <h2 class="sectionTitle">Interpretación</h2>
+                        <button class="iconBtn" id="speakIconBtn" title="Escuchar">🔊</button>
+                    </div>
+                    <div class="predictionBox">
+                        <span id="predictionText" class="predictionText">Esperando...</span>
+                    </div>
+                    <div class="confidenceRow">
+                        <span class="confidenceLabel">Precisión</span>
+                        <div class="confidenceBarWrap">
+                            <div class="confidenceBar" id="confidenceBar"></div>
+                        </div>
+                        <span class="confidenceValue" id="confidenceText">0%</span>
+                        <button class="iconBtn" id="clearBtn" title="Limpiar historial">🗑</button>
+                    </div>
+                </section>
 
-            </div>
+                <section class="historySection">
+                    <h2 class="sectionTitle">Historial</h2>
+                    <ul id="historyList"></ul>
+                </section>
 
-        </section>
+            </aside>
 
-        <section class="predictionCard">
-
-            <h2 id="predictionText">
-                Waiting...
-            </h2>
-
-            <p id="confidenceText">
-                0%
-            </p>
-
-        </section>
-
-        <section class="topPredictions">
-
-            <h3>Top Predictions</h3>
-
-            <div id="topPredictionsContainer">
-                ---
-            </div>
-
-        </section>
-
-        <section class="recordedTestSection">
-
-            <h3>Test Recorded Video</h3>
-
-            <input
-                id="recordedVideoInput"
-                type="file"
-                accept="video/*">
-
-            <button id="recordedVideoBtn">
-                Test Video
-            </button>
-
-            <label>
-                Start frame
-                <input
-                    id="recordedStartFrame"
-                    type="number"
-                    min="0"
-                    placeholder="0">
-            </label>
-
-            <label>
-                End frame
-                <input
-                    id="recordedEndFrame"
-                    type="number"
-                    min="0"
-                    placeholder="full video">
-            </label>
-
-            <video
-                id="recordedVideo"
-                muted
-                playsinline
-                controls>
-            </video>
-
-            <pre id="recordedVideoResult">No video tested.</pre>
-
-        </section>
-
-        <section class="controls">
-
-            <button id="speakBtn">
-                🔊 Speak
-            </button>
-
-            <button id="clearBtn">
-                🗑 Clear History
-            </button>
-
-        </section>
-
-        <section class="historySection">
-
-            <h3>History</h3>
-
-            <ul id="historyList"></ul>
-
-        </section>
+        </div>
 
     </div>
 
@@ -151,7 +98,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=13"></script>
 
 </body>
 
