@@ -1034,6 +1034,26 @@ async function startApp() {
     }
 }
 
+function setupFullscreen(btnId) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+            btn.textContent = "✕";
+            btn.title = "Salir de pantalla completa";
+        } else {
+            document.exitFullscreen();
+        }
+    });
+    document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) {
+            btn.textContent = "⛶";
+            btn.title = "Pantalla completa";
+        }
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     initializeUI();
     initAmbiguityModal();
@@ -1043,5 +1063,6 @@ document.addEventListener("DOMContentLoaded", () => {
         historyWords = [];
         renderHistory();
     });
+    setupFullscreen("fullscreenBtn");
     startApp();
 });

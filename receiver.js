@@ -79,3 +79,20 @@ clearBtn.addEventListener("click", () => {
     lastWordEl.textContent = "—";
     renderHistory();
 });
+
+const fsBtn = document.getElementById("fullscreenBtn");
+fsBtn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        fsBtn.textContent = "✕";
+        fsBtn.title = "Salir de pantalla completa";
+    } else {
+        document.exitFullscreen();
+    }
+});
+document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) {
+        fsBtn.textContent = "⛶";
+        fsBtn.title = "Pantalla completa";
+    }
+});
