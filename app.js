@@ -296,30 +296,48 @@ async function loadModel() {
 }
 
 // =========================
-// BROADCAST (receiver tab)
+// FIREBASE BROADCAST
 // =========================
 
-const receiverChannel = new BroadcastChannel("sign_language_receiver");
+let dbRef = null;
+
+function initFirebase() {
+    const { initializeApp } = window.firebaseApp;
+    const { getDatabase, ref, set } = window.firebaseDb;
+
+    const app = initializeApp({
+        apiKey:            "AIzaSyCvOY0ViyK7SEIt5Ym3EeLtVMN7CfA7MZY",
+        authDomain:        "cafe-central-2a4f3.firebaseapp.com",
+        databaseURL:       "https://cafe-central-2a4f3-default-rtdb.firebaseio.com",
+        projectId:         "cafe-central-2a4f3",
+        storageBucket:     "cafe-central-2a4f3.firebasestorage.app",
+        messagingSenderId: "334981865406",
+        appId:             "1:334981865406:web:0fe64f912092a961f423ef"
+    });
+
+    const db = getDatabase(app);
+    dbRef = { db, ref, set };
+    console.log("Firebase initialized");
+}
 
 let frameBroadcastInterval = null;
 
 function startFrameBroadcast() {
     if (frameBroadcastInterval) return;
     frameBroadcastInterval = setInterval(() => {
-        if (!video || !mirrorCanvas) return;
-        // Send a small thumbnail of the mirrored canvas
+        if (!video || !mirrorCanvas || !dbRef) return;
         const thumb = document.createElement("canvas");
         thumb.width  = 320;
         thumb.height = 180;
-        const tCtx = thumb.getContext("2d");
-        tCtx.drawImage(mirrorCanvas, 0, 0, 320, 180);
-        const dataUrl = thumb.toDataURL("image/jpeg", 0.4);
-        receiverChannel.postMessage({ type: "frame", dataUrl });
-    }, 100); // ~10fps
+        thumb.getContext("2d").drawImage(mirrorCanvas, 0, 0, 320, 180);
+        const dataUrl = thumb.toDataURL("image/jpeg", 0.3);
+        dbRef.set(dbRef.ref(dbRef.db, "session/frame"), { dataUrl, ts: Date.now() });
+    }, 200); // ~5fps — Firebase has write limits
 }
 
 function broadcastWord(word, time, allWords) {
-    receiverChannel.postMessage({ type: "word", word, time, allWords });
+    if (!dbRef) return;
+    dbRef.set(dbRef.ref(dbRef.db, "session/words"), { word, time, allWords, ts: Date.now() });
 }
 
 // =========================
@@ -1064,5 +1082,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderHistory();
     });
     setupFullscreen("fullscreenBtn");
+    initFirebase();
     startApp();
 });

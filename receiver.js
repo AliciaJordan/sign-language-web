@@ -1,4 +1,3 @@
-const channel     = new BroadcastChannel("sign_language_receiver");
 const lastWordEl  = document.getElementById("lastWord");
 const historyList = document.getElementById("historyList");
 const cameraFeed  = document.getElementById("cameraFeed");
@@ -7,8 +6,8 @@ const statusDot   = document.getElementById("statusDot");
 const statusLabel = document.getElementById("statusLabel");
 const clearBtn    = document.getElementById("clearBtn");
 
-let words         = [];
-let frameTimeout  = null;
+let words       = [];
+let frameTimeout = null;
 
 function setOnline() {
     statusDot.classList.remove("offline");
@@ -27,23 +26,15 @@ function showFrame(dataUrl) {
     cameraFeed.src = dataUrl;
     noSignal.classList.add("hidden");
     setOnline();
-
-    // If no frame arrives for 2s, show no-signal
     clearTimeout(frameTimeout);
-    frameTimeout = setTimeout(setOffline, 2000);
+    frameTimeout = setTimeout(setOffline, 3000);
 }
 
-function addWord(word, time) {
-    words.unshift({ word, time });
-    if (words.length > 15) words.pop();
-
-    // Flash the last word display
+function flashWord(word) {
     lastWordEl.classList.remove("flash");
-    void lastWordEl.offsetWidth; // reflow to restart animation
+    void lastWordEl.offsetWidth;
     lastWordEl.textContent = word;
     lastWordEl.classList.add("flash");
-
-    renderHistory();
 }
 
 function renderHistory() {
@@ -59,20 +50,39 @@ function renderHistory() {
     });
 }
 
-channel.onmessage = (e) => {
-    const { type } = e.data;
-    if (type === "frame") {
-        showFrame(e.data.dataUrl);
-    } else if (type === "word") {
-        // Sync full history from interpreter tab
-        words = e.data.allWords;
-        lastWordEl.classList.remove("flash");
-        void lastWordEl.offsetWidth;
-        lastWordEl.textContent = e.data.word;
-        lastWordEl.classList.add("flash");
+function initFirebase() {
+    const { initializeApp } = window.firebaseApp;
+    const { getDatabase, ref, onValue } = window.firebaseDb;
+
+    const app = initializeApp({
+        apiKey:            "AIzaSyCvOY0ViyK7SEIt5Ym3EeLtVMN7CfA7MZY",
+        authDomain:        "cafe-central-2a4f3.firebaseapp.com",
+        databaseURL:       "https://cafe-central-2a4f3-default-rtdb.firebaseio.com",
+        projectId:         "cafe-central-2a4f3",
+        storageBucket:     "cafe-central-2a4f3.firebasestorage.app",
+        messagingSenderId: "334981865406",
+        appId:             "1:334981865406:web:0fe64f912092a961f423ef"
+    });
+
+    const db = getDatabase(app);
+
+    // Listen for camera frames
+    onValue(ref(db, "session/frame"), (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.dataUrl) showFrame(data.dataUrl);
+    });
+
+    // Listen for new words
+    onValue(ref(db, "session/words"), (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+        words = data.allWords || [];
+        flashWord(data.word);
         renderHistory();
-    }
-};
+    });
+
+    console.log("Firebase receiver initialized");
+}
 
 clearBtn.addEventListener("click", () => {
     words = [];
@@ -80,6 +90,7 @@ clearBtn.addEventListener("click", () => {
     renderHistory();
 });
 
+// Fullscreen
 const fsBtn = document.getElementById("fullscreenBtn");
 fsBtn.addEventListener("click", () => {
     if (!document.fullscreenElement) {
@@ -96,3 +107,6 @@ document.addEventListener("fullscreenchange", () => {
         fsBtn.title = "Pantalla completa";
     }
 });
+
+// Firebase loads via module script in HTML, wait for it
+window.addEventListener("load", initFirebase);
