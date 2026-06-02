@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Translator</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="manifest" href="manifest.json">
+
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+
+    <script type="module">
+        import {
+            FilesetResolver,
+            HandLandmarker,
+            PoseLandmarker,
+            DrawingUtils
+        } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+        window.FilesetResolver = FilesetResolver;
+        window.HandLandmarker = HandLandmarker;
+        window.PoseLandmarker = PoseLandmarker;
+        window.DrawingUtils = DrawingUtils;
+    </script>
+
+</head>
+
+<body>
+
+    <div class="app">
+
+        <header>
+            <h1>🤟 Sign Language Translator</h1>
+        </header>
+
+        <section class="cameraSection">
+
+            <div class="cameraWrapper">
+
+                <video
+                    id="video"
+                    autoplay
+                    playsinline
+                    muted>
+                </video>
+
+                <canvas id="overlay"></canvas>
+
+            </div>
+
+        </section>
+
+        <section class="predictionCard">
+
+            <h2 id="predictionText">
+                Waiting...
+            </h2>
+
+            <p id="confidenceText">
+                0%
+            </p>
+
+        </section>
+
+        <section class="topPredictions">
+
+            <h3>Top Predictions</h3>
+
+            <div id="topPredictionsContainer">
+                ---
+            </div>
+
+        </section>
+
+        <section class="recordedTestSection">
+
+            <h3>Test Recorded Video</h3>
+
+            <input
+                id="recordedVideoInput"
+                type="file"
+                accept="video/*">
+
+            <button id="recordedVideoBtn">
+                Test Video
+            </button>
+
+            <label>
+                Start frame
+                <input
+                    id="recordedStartFrame"
+                    type="number"
+                    min="0"
+                    placeholder="0">
+            </label>
+
+            <label>
+                End frame
+                <input
+                    id="recordedEndFrame"
+                    type="number"
+                    min="0"
+                    placeholder="full video">
+            </label>
+
+            <video
+                id="recordedVideo"
+                muted
+                playsinline
+                controls>
+            </video>
+
+            <pre id="recordedVideoResult">No video tested.</pre>
+
+        </section>
+
+        <section class="controls">
+
+            <button id="speakBtn">
+                🔊 Speak
+            </button>
+
+            <button id="clearBtn">
+                🗑 Clear History
+            </button>
+
+        </section>
+
+        <section class="historySection">
+
+            <h3>History</h3>
+
+            <ul id="historyList"></ul>
+
+        </section>
+
+    </div>
+
+    <!-- Ambiguity modal -->
+    <div id="ambiguityOverlay" class="ambiguityOverlay hidden">
+        <div class="ambiguityModal">
+            <p class="ambiguityQuestion">¿Cuál seña quisiste decir?</p>
+            <div class="ambiguityOptions">
+                <button id="ambiguityBtn0" class="ambiguityBtn"></button>
+                <button id="ambiguityBtn1" class="ambiguityBtn"></button>
+            </div>
+            <button id="ambiguityDismiss" class="ambiguityDismiss">Cancelar</button>
+        </div>
+    </div>
+
+    <script src="app.js?v=6"></script>
+
+</body>
+
+</html>
