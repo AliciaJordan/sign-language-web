@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafetería — Vista del Cajero</title>
+    <link rel="stylesheet" href="receiver.css">
+</head>
+<body>
+
+    <div class="app">
+
+        <header class="appHeader">
+            <div class="appHeaderLeft">
+                <span class="cafeIcon">☕</span>
+                <div>
+                    <h1>Café Central</h1>
+                    <p class="appSubtitle">Sistema de atención inclusiva</p>
+                </div>
+            </div>
+            <div class="headerRight">
+                <div class="statusBadge" id="statusBadge">
+                    <div id="statusDot" class="statusDot offline"></div>
+                    <span id="statusLabel">Sin conexión</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="mainLayout">
+
+            <!-- Left col: order + history -->
+            <div class="leftCol">
+
+                <!-- Current order -->
+                <section class="card orderCard">
+                    <div class="cardHeader">
+                        <h2 class="sectionTitle">Pedido actual</h2>
+                        <button class="iconBtn" id="clearBtn" title="Limpiar pedido">🗑</button>
+                    </div>
+                    <div class="lastWordBox">
+                        <div class="lastWordInner">
+                            <span class="lastWordLabel">Última seña</span>
+                            <span id="lastWord" class="lastWord">—</span>
+                        </div>
+                    </div>
+                    <ul id="historyList" class="historyList"></ul>
+                </section>
+
+            </div>
+
+            <!-- Right col: camera + menu -->
+            <div class="rightCol">
+
+                <!-- Camera -->
+                <section class="card cameraCard">
+                    <div class="cardHeader">
+                        <h2 class="sectionTitle">Intérprete</h2>
+                    </div>
+                    <div class="cameraWrap">
+                        <img id="cameraFeed" class="cameraFeed" alt="Feed" />
+                        <div class="noSignal" id="noSignal">
+                            <span class="noSignalIcon">📷</span>
+                            <span>Esperando intérprete...</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Menu -->
+                <section class="card menuCard">
+                    <div class="cardHeader">
+                        <h2 class="sectionTitle">Menú del día</h2>
+                        <span class="menuBadge">Hoy</span>
+                    </div>
+                    <div class="menuGrid">
+                        <div class="menuItem">
+                            <span class="menuEmoji">☕</span>
+                            <span class="menuName">Café Americano</span>
+                            <span class="menuPrice">$35</span>
+                        </div>
+                        <div class="menuItem">
+                            <span class="menuEmoji">🥛</span>
+                            <span class="menuName">Café Latte</span>
+                            <span class="menuPrice">$45</span>
+                        </div>
+                        <div class="menuItem">
+                            <span class="menuEmoji">🧋</span>
+                            <span class="menuName">Frappé</span>
+                            <span class="menuPrice">$55</span>
+                        </div>
+                        <div class="menuItem">
+                            <span class="menuEmoji">🍵</span>
+                            <span class="menuName">Té chai</span>
+                            <span class="menuPrice">$30</span>
+                        </div>
+                        <div class="menuItem">
+                            <span class="menuEmoji">🥐</span>
+                            <span class="menuName">Croissant</span>
+                            <span class="menuPrice">$28</span>
+                        </div>
+                        <div class="menuItem">
+                            <span class="menuEmoji">🧁</span>
+                            <span class="menuName">Muffin</span>
+                            <span class="menuPrice">$25</span>
+                        </div>
+                        <div class="menuItem">
+                            <span class="menuEmoji">🥪</span>
+                            <span class="menuName">Sándwich</span>
+                            <span class="menuPrice">$65</span>
+                        </div>
+                        <div class="menuItem">
+                            <span class="menuEmoji">🍰</span>
+                            <span class="menuName">Pay de queso</span>
+                            <span class="menuPrice">$40</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="receiver.js"></script>
+</body>
+</html>

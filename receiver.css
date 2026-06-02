@@ -1,0 +1,338 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #e8f0fb;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    color: #1e3a5f;
+    min-height: 100vh;
+}
+
+.app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ========================
+   HEADER
+======================== */
+
+.appHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1d4ed8;
+    border-radius: 20px;
+    padding: 18px 28px;
+    box-shadow: 0 4px 16px rgba(29,78,216,.35);
+    color: white;
+}
+
+.appHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cafeIcon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.appHeaderLeft h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -.3px;
+}
+
+.appSubtitle {
+    font-size: .78rem;
+    color: #bfdbfe;
+    margin-top: 2px;
+}
+
+.statusBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.15);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: .8rem;
+    color: white;
+    font-weight: 500;
+}
+
+.statusDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transition: background .3s;
+    flex-shrink: 0;
+}
+
+.statusDot.offline { background: #93c5fd; }
+.statusDot.online  { background: #4ade80; box-shadow: 0 0 0 3px rgba(74,222,128,.3); }
+
+/* ========================
+   LAYOUT
+======================== */
+
+.mainLayout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 16px;
+    align-items: start;
+}
+
+.leftCol,
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ========================
+   CARDS
+======================== */
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 2px 12px rgba(29,78,216,.08);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.sectionTitle {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.iconBtn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #93c5fd;
+    padding: 4px 6px;
+    border-radius: 8px;
+    transition: background .15s, color .15s;
+}
+
+.iconBtn:hover { background: #eff6ff; color: #1d4ed8; }
+
+/* ========================
+   ORDER / LAST WORD
+======================== */
+
+.lastWordBox {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1.5px solid #bfdbfe;
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.lastWordInner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.lastWordLabel {
+    font-size: .7rem;
+    font-weight: 600;
+    color: #3b82f6;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+.lastWord {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #1d4ed8;
+    line-height: 1;
+}
+
+.lastWord.flash {
+    animation: flash .35s ease;
+}
+
+@keyframes flash {
+    0%   { opacity: 0; transform: scale(.88); }
+    60%  { transform: scale(1.06); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* ========================
+   HISTORY LIST
+======================== */
+
+.historyList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.historyList::-webkit-scrollbar { width: 4px; }
+.historyList::-webkit-scrollbar-track { background: transparent; }
+.historyList::-webkit-scrollbar-thumb { background: #bfdbfe; border-radius: 99px; }
+
+.historyList li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 6px;
+    border-bottom: 1px solid #eff6ff;
+    font-size: .9rem;
+    color: #1e3a5f;
+}
+
+.historyList li:last-child { border-bottom: none; }
+
+.historyDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3b82f6;
+    flex-shrink: 0;
+}
+
+.historyWord {
+    flex: 1;
+    font-weight: 600;
+}
+
+.historyTime {
+    font-size: .72rem;
+    color: #93c5fd;
+    white-space: nowrap;
+}
+
+/* ========================
+   CAMERA
+======================== */
+
+.cameraCard { padding: 18px; }
+
+.cameraWrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #0f172a;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.cameraFeed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.noSignal {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #475569;
+    font-size: .85rem;
+    background: #0f172a;
+}
+
+.noSignal.hidden { display: none; }
+
+.noSignalIcon { font-size: 2rem; opacity: .5; }
+
+/* ========================
+   MENU
+======================== */
+
+.menuBadge {
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.menuGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8faff;
+    border: 1px solid #e0eaff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    transition: background .15s, border-color .15s;
+}
+
+.menuItem:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.menuEmoji { font-size: 1.25rem; flex-shrink: 0; }
+
+.menuName {
+    flex: 1;
+    font-size: .78rem;
+    font-weight: 600;
+    color: #1e3a5f;
+    line-height: 1.2;
+}
+
+.menuPrice {
+    font-size: .8rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    white-space: nowrap;
+}
+
+/* ========================
+   RESPONSIVE
+======================== */
+
+@media (max-width: 800px) {
+    .mainLayout {
+        grid-template-columns: 1fr;
+    }
+    .rightCol { order: -1; }
+    .lastWord { font-size: 2rem; }
+}

@@ -267,6 +267,7 @@ async function setupCamera() {
         mirrorCtx           = mirrorCanvas.getContext("2d");
 
         console.log("camera ready");
+        startFrameBroadcast();
     } catch (error) {
         showError("Unable to access camera. Allow camera permission and use HTTPS or localhost.");
         throw error;
@@ -285,6 +286,33 @@ async function loadModel() {
 }
 
 // =========================
+// BROADCAST (receiver tab)
+// =========================
+
+const receiverChannel = new BroadcastChannel("sign_language_receiver");
+
+let frameBroadcastInterval = null;
+
+function startFrameBroadcast() {
+    if (frameBroadcastInterval) return;
+    frameBroadcastInterval = setInterval(() => {
+        if (!video || !mirrorCanvas) return;
+        // Send a small thumbnail of the mirrored canvas
+        const thumb = document.createElement("canvas");
+        thumb.width  = 320;
+        thumb.height = 180;
+        const tCtx = thumb.getContext("2d");
+        tCtx.drawImage(mirrorCanvas, 0, 0, 320, 180);
+        const dataUrl = thumb.toDataURL("image/jpeg", 0.4);
+        receiverChannel.postMessage({ type: "frame", dataUrl });
+    }, 100); // ~10fps
+}
+
+function broadcastWord(word, time, allWords) {
+    receiverChannel.postMessage({ type: "word", word, time, allWords });
+}
+
+// =========================
 // HISTORY
 // =========================
 
@@ -294,6 +322,7 @@ function addToHistory(word) {
     historyWords.unshift({ word, time });
     if (historyWords.length > 15) historyWords.pop();
     renderHistory();
+    broadcastWord(word, time, historyWords);
 }
 
 function renderHistory() {
