@@ -5,9 +5,9 @@
 }
 
 body {
-    background: #f0f2f5;
+    background: #e8f0fb;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-    color: #222;
+    color: #1e3a5f;
     min-height: 100vh;
 }
 
@@ -32,27 +32,29 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: white;
-    border-radius: 16px;
-    padding: 16px 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    background: #1d4ed8;
+    border-radius: 20px;
+    padding: 18px 28px;
+    box-shadow: 0 4px 16px rgba(29,78,216,.35);
+    color: white;
 }
 
 .appHeaderLeft h1 {
     font-size: 1.2rem;
-    font-weight: 700;
-    color: #111;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -.3px;
 }
 
 .appSubtitle {
-    font-size: .8rem;
-    color: #888;
+    font-size: .78rem;
+    color: #bfdbfe;
     margin-top: 2px;
 }
 
 .settingsBtn {
-    background: none;
-    border: 1px solid #e0e0e0;
+    background: rgba(255,255,255,.15);
+    border: none;
     border-radius: 10px;
     width: 38px;
     height: 38px;
@@ -61,11 +63,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #555;
+    color: white;
     transition: background .15s;
 }
 
-.settingsBtn:hover { background: #f4f6f8; }
+.settingsBtn:hover { background: rgba(255,255,255,.25); }
 
 /* ========================
    MAIN LAYOUT
@@ -84,40 +86,43 @@ body {
 
 .cameraPanel {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    box-shadow: 0 2px 12px rgba(29,78,216,.08);
 }
 
 .cameraPanelHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e8f0ff;
 }
 
 .cameraPanelLabel {
     font-size: .9rem;
-    font-weight: 600;
-    color: #444;
+    font-weight: 700;
+    color: #1e3a5f;
+    text-transform: uppercase;
+    letter-spacing: .5px;
 }
 
 .speakBtn {
     display: flex;
     align-items: center;
     gap: 6px;
-    border: 1px solid #e0e0e0;
+    border: 1.5px solid #bfdbfe;
     border-radius: 20px;
     padding: 6px 14px;
     font-size: .85rem;
     cursor: pointer;
-    background: white;
-    color: #333;
-    transition: background .15s;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 600;
+    transition: background .15s, border-color .15s;
 }
 
-.speakBtn:hover { background: #f4f6f8; }
+.speakBtn:hover { background: #dbeafe; border-color: #93c5fd; }
 
 .cameraWrapper {
     position: relative;
@@ -156,9 +161,9 @@ body {
 
 .interpretationSection {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    box-shadow: 0 2px 12px rgba(29,78,216,.08);
 }
 
 .sectionHeader {
@@ -169,9 +174,11 @@ body {
 }
 
 .sectionTitle {
-    font-size: 1rem;
+    font-size: .95rem;
     font-weight: 700;
-    color: #111;
+    color: #1e3a5f;
+    text-transform: uppercase;
+    letter-spacing: .5px;
 }
 
 .iconBtn {
@@ -179,17 +186,18 @@ body {
     border: none;
     font-size: 1.1rem;
     cursor: pointer;
-    color: #888;
-    padding: 4px;
+    color: #93c5fd;
+    padding: 4px 6px;
     border-radius: 8px;
-    transition: background .15s;
+    transition: background .15s, color .15s;
 }
 
-.iconBtn:hover { background: #f4f6f8; }
+.iconBtn:hover { background: #eff6ff; color: #1d4ed8; }
 
 .predictionBox {
-    border: 1px solid #e8e8e8;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1.5px solid #bfdbfe;
+    border-radius: 16px;
     padding: 24px 16px;
     text-align: center;
     margin-bottom: 16px;
@@ -201,8 +209,8 @@ body {
 
 .predictionText {
     font-size: 1.8rem;
-    font-weight: 700;
-    color: #111;
+    font-weight: 800;
+    color: #1d4ed8;
 }
 
 .confidenceRow {
@@ -213,21 +221,24 @@ body {
 
 .confidenceLabel {
     font-size: .75rem;
-    color: #888;
+    color: #93c5fd;
     white-space: nowrap;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .4px;
 }
 
 .confidenceBarWrap {
     flex: 1;
     height: 6px;
-    background: #eee;
+    background: #dbeafe;
     border-radius: 99px;
     overflow: hidden;
 }
 
 .confidenceBar {
     height: 100%;
-    background: #2563eb;
+    background: #1d4ed8;
     border-radius: 99px;
     width: 0%;
     transition: width .4s ease;
@@ -236,7 +247,7 @@ body {
 .confidenceValue {
     font-size: .8rem;
     font-weight: 700;
-    color: #2563eb;
+    color: #1d4ed8;
     min-width: 36px;
     text-align: right;
 }
@@ -247,9 +258,9 @@ body {
 
 .historySection {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    box-shadow: 0 2px 12px rgba(29,78,216,.08);
 }
 
 .historySection .sectionTitle {
@@ -267,10 +278,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 8px;
-    border-bottom: 1px solid #f4f4f4;
-    font-size: .95rem;
-    color: #333;
+    padding: 10px 6px;
+    border-bottom: 1px solid #eff6ff;
+    font-size: .9rem;
+    color: #1e3a5f;
     gap: 8px;
 }
 
@@ -280,12 +291,12 @@ body {
 
 .historyWord {
     flex: 1;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .historyTime {
-    font-size: .75rem;
-    color: #bbb;
+    font-size: .72rem;
+    color: #93c5fd;
     white-space: nowrap;
 }
 
@@ -293,7 +304,7 @@ body {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #22c55e;
+    background: #3b82f6;
     flex-shrink: 0;
 }
 
@@ -320,15 +331,15 @@ body {
     border-radius: 24px;
     padding: 32px 28px;
     text-align: center;
-    box-shadow: 0 16px 48px rgba(0,0,0,.2);
+    box-shadow: 0 16px 48px rgba(29,78,216,.2);
     width: min(360px, 90vw);
 }
 
 .ambiguityQuestion {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 24px;
-    color: #222;
+    color: #1e3a5f;
 }
 
 .ambiguityOptions {
@@ -339,32 +350,33 @@ body {
 
 .ambiguityBtn {
     flex: 1;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #bfdbfe;
     border-radius: 16px;
     padding: 20px 12px;
     font-size: 1.4rem;
     font-weight: 700;
     cursor: pointer;
-    background: #f4f6f8;
+    background: #eff6ff;
+    color: #1e3a5f;
     transition: background .15s, border-color .15s, transform .1s;
 }
 
 .ambiguityBtn:hover {
-    background: #e8f0fe;
-    border-color: #2563eb;
+    background: #dbeafe;
+    border-color: #1d4ed8;
     transform: translateY(-2px);
 }
 
 .ambiguityDismiss {
     border: none;
     background: none;
-    color: #999;
+    color: #93c5fd;
     font-size: .95rem;
     cursor: pointer;
     padding: 4px 8px;
 }
 
-.ambiguityDismiss:hover { color: #555; }
+.ambiguityDismiss:hover { color: #1d4ed8; }
 
 /* ========================
    RESPONSIVE
